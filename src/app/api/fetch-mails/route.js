@@ -24,7 +24,6 @@ export async function GET(req) {
   const from = url.searchParams.get("from");
   const subjects = [
     '"Important: How to update your Netflix Household"',
-    '"Netflix: Your sign-in code"',
     '"Your Netflix temporary access code"',
   ];
 
@@ -36,12 +35,16 @@ export async function GET(req) {
 
   const oAuth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET
+    process.env.GOOGLE_CLIENT_SECRET,
+    "https://developers.google.com/oauthplayground"
   );
 
   oAuth2Client.setCredentials({
     refresh_token: process.env.GMAIL_REFRESH_TOKEN,
   });
+
+  // FORCE refresh (surface invalid_grant immediately)
+  await oAuth2Client.getAccessToken();
 
   const gmail = google.gmail({ version: "v1", auth: oAuth2Client });
 
